@@ -1,49 +1,70 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
-/* This testbench just instantiates the module and makes some convenient wires
-   that can be driven / tested by the cocotb test.py.
+/*
+  This testbench will simulate the tt_um_example counter module.
 */
+
 module tb ();
 
-  // Dump the signals to a FST file. You can view it with gtkwave or surfer.
-  initial begin
-    $dumpfile("tb.fst");
-    $dumpvars(0, tb);
-    #1;
-  end
-
-  // Wire up the inputs and outputs:
-  reg clk;
-  reg rst_n;
-  reg ena;
+  // Inputs are defined as regs (we drive them)
   reg [7:0] ui_in;
   reg [7:0] uio_in;
+  reg       ena;
+  reg       clk;
+  reg       rst_n;
+
+  // Outputs are defined as wires (we observe them)
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
-`ifdef GL_TEST
-  wire VPWR = 1'b1;
-  wire VGND = 1'b0;
-`endif
 
-  // Replace tt_um_example with your module name:
-  tt_um_example user_project (
-
-      // Include power ports for the Gate Level test:
-`ifdef GL_TEST
-      .VPWR(VPWR),
-      .VGND(VGND),
-`endif
-
-      .ui_in  (ui_in),    // Dedicated inputs
-      .uo_out (uo_out),   // Dedicated outputs
-      .uio_in (uio_in),   // IOs: Input path
-      .uio_out(uio_out),  // IOs: Output path
-      .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
-      .ena    (ena),      // enable - goes high when design is selected
-      .clk    (clk),      // clock
-      .rst_n  (rst_n)     // not reset
+  // Instantiate the Unit Under Test (UUT)
+  tt_um_example uut (
+    .ui_in   (ui_in),
+    .uo_out  (uo_out),
+    .uio_in  (uio_in),
+    .uio_out (uio_out),
+    .uio_oe  (uio_oe),
+    .ena     (ena),
+    .clk     (clk),
+    .rst_n   (rst_n)
   );
+
+  // Clock generation: Toggle clock every 5ns (100MHz)
+  always #5 clk = ~clk;
+
+  initial begin
+    // Setup waveform dumping (optional, for viewing in GTKWave)
+    $dumpfile("tb.vcd");
+    $dumpvars(0, tb);
+
+    // Initialize inputs
+    clk = 0;
+    rst_n = 0;      // Start in reset
+    ui_in = 0;
+    uio_in = 0;
+    ena = 1;
+
+    // Wait 20ns, then release reset
+    #20 rst_n = 1;
+    $display("Reset released at %t", $time);
+
+    // Let the counter run for a few cycles
+    #100;
+
+    // Check if counter is working (simple debug print)
+    $display("Current count: %d", uo_out);
+
+    // Test reset again mid-count
+    #50 rst_n = 0;
+    #20 rst_n = 1;
+    
+    // Run for a bit longer to see it start over
+    #200;
+
+    $display("Simulation finished at %t", $time);
+    $finish;
+  end
 
 endmodule

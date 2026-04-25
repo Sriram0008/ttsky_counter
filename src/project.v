@@ -16,24 +16,28 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Internal 8-bit register
+  // Internal 8-bit register for the counter
   reg [7:0] count_reg;
 
-  // Drive outputs
+  // Assign the internal register to the output pins
   assign uo_out  = count_reg;
+
+  // Set all bidirectional pins as inputs (oe=0) and drive 0 on the output path
   assign uio_out = 8'b0;
   assign uio_oe  = 8'b0;
 
   // Synchronous Counter Logic
   always @(posedge clk) begin
     if (!rst_n) begin
+      // Synchronous reset: set count to zero
       count_reg <= 8'h00;
     end else begin
+      // Increment count on every clock edge
       count_reg <= count_reg + 1'b1;
     end
   end
 
-  // Tie off unused signals to avoid warnings
+  // Tie off unused input signals to prevent synthesis warnings
   wire _unused = &{ui_in, uio_in, ena, 1'b0};
 
 endmodule

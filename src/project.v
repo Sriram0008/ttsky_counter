@@ -10,33 +10,30 @@ module tt_um_example (
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // IOs: Input path
     output wire [7:0] uio_out,  // IOs: Output path
-    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
+    output wire [7:0] uio_oe,   // IOs: Enable path (active high)
     input  wire       ena,      // always 1 when the design is powered
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Internal register to hold the count value
+  // Internal 8-bit register
   reg [7:0] count_reg;
 
-  // Assign the register value to the dedicated output pins
-  assign uo_out = count_reg;
-
-  // Set unused bidirectional IOs to 0 and set them as inputs (oe=0)
+  // Drive outputs
+  assign uo_out  = count_reg;
   assign uio_out = 8'b0;
   assign uio_oe  = 8'b0;
 
-  // Counter Logic
-always @(posedge clk) begin
+  // Synchronous Counter Logic
+  always @(posedge clk) begin
     if (!rst_n) begin
-      count_reg <= 8'b0;
+      count_reg <= 8'h00;
     end else begin
       count_reg <= count_reg + 1'b1;
     end
   end
 
-  // List all unused inputs to prevent linter warnings
-  // ui_in, uio_in, and ena are not used in this specific counter logic
+  // Tie off unused signals to avoid warnings
   wire _unused = &{ui_in, uio_in, ena, 1'b0};
 
 endmodule

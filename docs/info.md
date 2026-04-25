@@ -1,5 +1,9 @@
+# 8-bit Binary Counter
+
 ## How it works
-This project is a synchronous 8-bit binary counter. It uses a single 8-bit register that increments on every rising edge of the clock (`clk`). The counter value is output to the dedicated output pins (`uo_out`). When the active-low reset signal (`rst_n`) is pulled low, the counter resets to 0.
+The design implements a standard 8-bit synchronous up-counter. On every rising edge of the clock, the internal 8-bit register increments by one. The count is then visible on the 8 dedicated output pins.
 
 ## How to test
-After power-on, ensure `ena` is high and `rst_n` is pulled low to initialize the counter. Once `rst_n` is released (set to high), provide a clock signal to the `clk` pin. You can observe the binary count increasing on the output pins `uo[0]` through `uo[7]`.
+1. Provide a clock signal to the `clk` pin.
+2. Pulse the `rst_n` pin low to reset the counter to zero.
+3. Observe the binary sequence on the output pins `uo[7:0]`.

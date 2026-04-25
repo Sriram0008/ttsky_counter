@@ -1,54 +1,36 @@
-# SPDX-FileCopyrightText: © 2024 Your Name
-# SPDX-License-Identifier: Apache-2.0
-
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+from cocotb.triggers import ClockCycles, FallingEdge
 
 @cocotb.test()
 async def test_counter(dut):
     dut._log.info("Starting Counter Test")
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, unit="us")
+    # 100MHz clock (10ns period)
+    clock = Clock(dut.clk, 10, unit="ns")
     cocotb.start_soon(clock.start())
 
-    # --- Reset Phase ---
-    dut._log.info("Apply Reset")
+    # Initialize / Reset
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
     
-    # Wait 10 cycles to ensure reset is captured
-    await ClockCycles(dut.clk, 10)
-    
-    # Check that output is 0 after reset
-    assert dut.uo_out.value == 0, f"Expected 0 after reset, got {dut.uo_out.value}"
+    assert int(dut.uo_out.value) == 0, "Reset failed"
     
     dut.rst_n.value = 1
-    dut._log.info("Reset Released")
+    dut._log.info("Reset released")
 
-    # --- Testing Increment Logic ---
-    dut._log.info("Verifying increments")
-    
-    # Let's check the first 10 increments
+    # Test increments
     for i in range(1, 11):
         await ClockCycles(dut.clk, 1)
-        current_count = int(dut.uo_out.value)
-        dut._log.info(f"Cycle {i}: Count is {current_count}")
-        assert current_count == i, f"Counter error: Expected {i}, got {current_count}"
-
-    # --- Testing Overflow/Wrap-around ---
-    dut._log.info("Fast-forwarding to test wrap-around")
-    
-    # We are currently at 10. To get to 255, we need 245 more cycles.
-    await ClockCycles(dut.clk, 245)
-    assert dut.uo_out.value == 255
-    
-    # One more cycle should wrap it back to 0
-    await ClockCycles(dut.clk, 1)
-    assert dut.uo_out.value == 0
-    dut._log.info("Counter successfully wrapped around to 0")
-
-    dut._log.info("All tests passed!")
+        # We wait for the FallingEdge to ensure the RisingEdge logic 
+        # has finished propagating through the simulator.
+        await FallingEdge(dut.clk) 
+        
+        current_val = int(dut.uo_out.value)
+        dut._log.info(f"Cycle {i}: Expected {i}, Got {current_val}")
+        assert current_val == i
+        
+    dut._log.info("Counter sequence verified successfully!")

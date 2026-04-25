@@ -1,32 +1,30 @@
-import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles, FallingEdge
+`default_nettype none
+`timescale 1ns / 1ps
 
-@cocotb.test()
-async def test_counter(dut):
-    dut._log.info("Starting Counter Test")
+module tb ();
+  initial begin
+    $dumpfile("tb.vcd");
+    $dumpvars(0, tb);
+  end
 
-    # Start a 100MHz clock
-    clock = Clock(dut.clk, 10, unit="ns")
-    cocotb.start_soon(clock.start())
+  reg [7:0] ui_in;
+  reg [7:0] uio_in;
+  reg       ena;
+  reg       clk;
+  reg       rst_n;
 
-    # Initialize inputs
-    dut.ena.value = 1
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    
-    # Assert reset state
-    assert int(dut.uo_out.value) == 0, f"Reset failed: {dut.uo_out.value}"
-    
-    # Release reset
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+  wire [7:0] uo_out;
+  wire [7:0] uio_out;
+  wire [7:0] uio_oe;
 
-    # Verify first 10 cycles
-    for i in range(1, 11):
-        await FallingEdge(dut.clk) # Wait for state to settle
-        current_val = int(dut.uo_out.value)
-        dut._log.info(f"Cycle {i}: Value is {current_val}")
-        assert current_val == i, f"Expected {i}, got {current_val}"
-
-    dut._log.info("Test Completed Successfully!")
+  tt_um_example uut (
+    .ui_in   (ui_in),
+    .uo_out  (uo_out),
+    .uio_in  (uio_in),
+    .uio_out (uio_out),
+    .uio_oe  (uio_oe),
+    .ena     (ena),
+    .clk     (clk),
+    .rst_n   (rst_n)
+  );
+endmodule

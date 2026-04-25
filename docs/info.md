@@ -1,20 +1,5 @@
-<!---
-
-This file is used to generate your project datasheet. Please fill in the information below and delete any unused
-sections.
-
-You can also include images in this folder and reference them in the markdown. Each image must be less than
-512 kb in size, and the combined size of all images must be less than 1 MB.
--->
-
 ## How it works
-
-Explain how your project works
+This project is a synchronous 8-bit binary counter. It uses a single 8-bit register that increments on every rising edge of the clock (`clk`). The counter value is output to the dedicated output pins (`uo_out`). When the active-low reset signal (`rst_n`) is pulled low, the counter resets to 0.
 
 ## How to test
-
-Explain how to use your project
-
-## External hardware
-
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+After power-on, ensure `ena` is high and `rst_n` is pulled low to initialize the counter. Once `rst_n` is released (set to high), provide a clock signal to the `clk` pin. You can observe the binary count increasing on the output pins `uo[0]` through `uo[7]`.

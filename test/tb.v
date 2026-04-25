@@ -1,20 +1,16 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
-/*
-  This testbench will simulate the tt_um_example counter module.
-*/
-
 module tb ();
 
-  // Inputs are defined as regs (we drive them)
+  // Initial inputs
   reg [7:0] ui_in;
   reg [7:0] uio_in;
   reg       ena;
   reg       clk;
   reg       rst_n;
 
-  // Outputs are defined as wires (we observe them)
+  // Outputs
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
@@ -31,40 +27,12 @@ module tb ();
     .rst_n   (rst_n)
   );
 
-  // Clock generation: Toggle clock every 5ns (100MHz)
-  always #5 clk = ~clk;
-
+  // We leave clk and rst_n for Cocotb to drive.
+  // We just need to dump the waveforms.
   initial begin
-    // Setup waveform dumping (optional, for viewing in GTKWave)
     $dumpfile("tb.vcd");
     $dumpvars(0, tb);
-
-    // Initialize inputs
-    clk = 0;
-    rst_n = 0;      // Start in reset
-    ui_in = 0;
-    uio_in = 0;
-    ena = 1;
-
-    // Wait 20ns, then release reset
-    #20 rst_n = 1;
-    $display("Reset released at %t", $time);
-
-    // Let the counter run for a few cycles
-    #100;
-
-    // Check if counter is working (simple debug print)
-    $display("Current count: %d", uo_out);
-
-    // Test reset again mid-count
-    #50 rst_n = 0;
-    #20 rst_n = 1;
-    
-    // Run for a bit longer to see it start over
-    #200;
-
-    $display("Simulation finished at %t", $time);
-    $finish;
+    #1;
   end
 
 endmodule

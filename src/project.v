@@ -27,12 +27,10 @@ module tt_um_example (
   assign uio_oe  = 8'b0;
 
   // Counter Logic
-  always @(posedge clk) begin
+always @(posedge clk) begin
     if (!rst_n) begin
-      // Synchronous reset: when rst_n is low, reset count to 0
       count_reg <= 8'b0;
     end else begin
-      // Increment the counter by 1 every clock cycle
       count_reg <= count_reg + 1'b1;
     end
   end

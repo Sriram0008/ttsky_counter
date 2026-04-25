@@ -1,15 +1,27 @@
 project:
-  title:        "8-bit Counter"
-  author:       "sriram"
-  description:  "A synchronous 8-bit binary counter"
+  title:        "8-bit Binary Counter"
+  author:       "Your Name"
+  discord:      ""
+  description:  "A simple synchronous 8-bit binary counter project."
   language:     "Verilog"
-  clock_hz:     10000000
-  tiles:        "1x1"
-  top_module:   "tt_um_example"
+  clock_hz:     10000000  # 10 MHz
+
+  tiles: "1x1"          
+  top_module:  "tt_um_example"
+
   source_files:
     - "project.v"
 
 pinout:
+  ui[0]: "unused"
+  ui[1]: "unused"
+  ui[2]: "unused"
+  ui[3]: "unused"
+  ui[4]: "unused"
+  ui[5]: "unused"
+  ui[6]: "unused"
+  ui[7]: "unused"
+
   uo[0]: "bit0"
   uo[1]: "bit1"
   uo[2]: "bit2"
@@ -18,3 +30,14 @@ pinout:
   uo[5]: "bit5"
   uo[6]: "bit6"
   uo[7]: "bit7"
+
+  uio[0]: "unused"
+  uio[1]: "unused"
+  uio[2]: "unused"
+  uio[3]: "unused"
+  uio[4]: "unused"
+  uio[5]: "unused"
+  uio[6]: "unused"
+  uio[7]: "unused"
+
+yaml_version: 6
